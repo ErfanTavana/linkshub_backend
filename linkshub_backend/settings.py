@@ -11,7 +11,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -35,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Myapp
     'accounts.apps.AccountsConfig',
+    'otp.apps.OtpConfig',
 ]
 
 MIDDLEWARE = [
@@ -120,3 +126,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # User default model
 AUTH_USER_MODEL = 'accounts.User'
+
+# Verification Code Settings
+# ==============================
+VERIFICATION_CODE_API_KEY = os.getenv("VERIFICATION_CODE_API_KEY", "default_api_key_here")
+VERIFICATION_CODE_VALIDITY_MINUTES = int(os.getenv("VERIFICATION_CODE_VALIDITY_MINUTES", 2))
+VERIFICATION_CODE_LENGTH = int(os.getenv("VERIFICATION_CODE_LENGTH", 4))
+VERIFICATION_CODE_REQUEST_LIMIT_HOURS = int(os.getenv("VERIFICATION_CODE_REQUEST_LIMIT_HOURS", 24))
+VERIFICATION_CODE_REQUEST_LIMIT = int(os.getenv("VERIFICATION_CODE_REQUEST_LIMIT", 24))
+LOCKED_TIME_MINUTES = int(os.getenv("LOCKED_TIME_MINUTES", 30))
+FAILED_ATTEMPTS_LIMIT = int(os.getenv("FAILED_ATTEMPTS_LIMIT", 8))
+# ==============================

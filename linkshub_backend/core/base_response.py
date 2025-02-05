@@ -18,9 +18,9 @@ class BaseResponse:
             "success": True,
             "code": code,
             "message": message,
-            "data": data,
-            "warnings": warnings,
-            "meta": meta
+            "data": data or {},
+            "warnings": warnings or [],
+            "meta": meta or {}
         }, status=status_code)
 
     @staticmethod
@@ -29,35 +29,36 @@ class BaseResponse:
             "success": False,
             "code": code,
             "message": message,
-            "data": data,
-            "errors": errors
+            "data": data or {},
+            "errors": errors or []
         }, status=status_code)
 
     @staticmethod
     def paginate_queryset(queryset, request, serializer_class, message="عملیات موفقیت‌آمیز بود.",
                           status_code=status.HTTP_200_OK, code=1000, warnings=None, extra_data=None, data_key='items'):
         paginator = DefaultPageNumberPagination()
-        paginated_queryset = paginator.paginate_queryset(queryset, request)
+        paginated_queryset = paginator.paginate_queryset(queryset, request) or []
         serializer = serializer_class(paginated_queryset, many=True)
 
         response_data = {data_key: serializer.data}
 
         if extra_data:
-            response_data.update({"extra_data": extra_data})
+            response_data["extra_data"] = extra_data
+
+        total_pages = paginator.page.paginator.num_pages
+        current_page = paginator.page.number
 
         meta = {
             "total_count": paginator.page.paginator.count,
-            "total_pages": paginator.page.paginator.num_pages,
-            "current_page": paginator.page.number,
+            "total_pages": total_pages,
+            "current_page": current_page,
             "page_size": paginator.get_page_size(request),
             "next": paginator.get_next_link(),
             "previous": paginator.get_previous_link(),
-            "first_page": 1,
-            "last_page": paginator.page.paginator.num_pages,
             "timestamp": timezone.now(),
-            "is_first_page": paginator.page.number == 1,
-            "is_last_page": paginator.page.number == paginator.page.paginator.num_pages,
-            "items_on_page": len(paginated_queryset),
+            "is_first_page": current_page == 1,
+            "is_last_page": current_page == total_pages,
+            "items_on_page": len(response_data[data_key]),
             "has_more": paginator.page.has_next(),
         }
 

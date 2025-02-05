@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Myapp
     'accounts.apps.AccountsConfig',
-    'otp.apps.OtpConfig',
 ]
 
 MIDDLEWARE = [

@@ -9,7 +9,10 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from accounts.models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 from linkshub_backend.settings import VERIFICATION_CODE_API_KEY, VERIFICATION_CODE_VALIDITY_MINUTES, \
     VERIFICATION_CODE_LENGTH, VERIFICATION_CODE_REQUEST_LIMIT_HOURS, VERIFICATION_CODE_REQUEST_LIMIT, \
     VERIFICATION_CODE_REQUEST_LIMIT, LOCKED_TIME_MINUTES, FAILED_ATTEMPTS_LIMIT

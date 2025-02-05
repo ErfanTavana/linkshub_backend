@@ -74,8 +74,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomUserManager()
 
-    USERNAME_FIELD = "email"  # ایمیل به عنوان فیلد اصلی ورود
-    REQUIRED_FIELDS = ["phone_number"]  # شماره تماس الزامی نیست، ولی می‌توان آن را وارد کرد
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["phone_number"]
 
     class Meta:
         verbose_name = "کاربر"

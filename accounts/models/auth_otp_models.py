@@ -13,13 +13,13 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-from linkshub_backend.settings import VERIFICATION_CODE_API_KEY, VERIFICATION_CODE_VALIDITY_MINUTES, \
+from accounts.constants import VERIFICATION_CODE_API_KEY, VERIFICATION_CODE_VALIDITY_MINUTES, \
     VERIFICATION_CODE_LENGTH, VERIFICATION_CODE_REQUEST_LIMIT_HOURS, VERIFICATION_CODE_REQUEST_LIMIT, \
     VERIFICATION_CODE_REQUEST_LIMIT, LOCKED_TIME_MINUTES, FAILED_ATTEMPTS_LIMIT
 
 
-class VerificationCode(models.Model):
-    """
+class OTPCode(models.Model):
+    """`
     Model to store verification codes for user actions like registration and password reset.
     """
     CODE_TYPE_CHOICES = [
@@ -86,12 +86,12 @@ class VerificationCode(models.Model):
                 limit_hours = VERIFICATION_CODE_REQUEST_LIMIT_HOURS
                 request_limit = VERIFICATION_CODE_REQUEST_LIMIT
                 time_threshold = timezone.now() - timedelta(hours=limit_hours)
-                request_count = VerificationCode.objects.filter(
+                request_count = OTPCode.objects.filter(
                     user=user, created_at__gte=time_threshold, code_type=code_type
                 ).count()
 
                 # محاسبه زمان بعدی که کاربر می‌تواند درخواست جدید ارسال کند
-                next_request_time = VerificationCode.objects.filter(
+                next_request_time = OTPCode.objects.filter(
                     user=user, created_at__gte=time_threshold, code_type=code_type
                 ).order_by('-created_at').first().created_at + timedelta(hours=limit_hours)
 
@@ -136,7 +136,7 @@ class VerificationCode(models.Model):
         limit_hours = VERIFICATION_CODE_REQUEST_LIMIT_HOURS
         request_limit = VERIFICATION_CODE_REQUEST_LIMIT
         time_threshold = timezone.now() - timedelta(hours=limit_hours)
-        request_count = VerificationCode.objects.filter(
+        request_count = OTPCode.objects.filter(
             user=self.user, created_at__gte=time_threshold, code_type=self.code_type
         ).count()
         return request_count >= request_limit

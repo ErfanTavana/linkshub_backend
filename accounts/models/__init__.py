@@ -1,4 +1,4 @@
 from .user import User
-from .verification import VerificationCode
+from .auth_otp_models import OTPCode
 
-__all__ = ["User", "VerificationCode"]
+__all__ = ["User", "OTPCode"]

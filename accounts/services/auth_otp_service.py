@@ -1,5 +1,4 @@
-from accounts.utils import format_phone_number
-from linkshub_backend.core.exceptions import CustomValidationError
+
 from accounts.repositories import get_or_create_user_by_phone, get_latest_otp, has_exceeded_request_limit, \
     get_next_request_time
 from django.utils import timezone

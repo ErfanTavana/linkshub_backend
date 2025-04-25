@@ -125,3 +125,10 @@ class ErrorCodes:
         "errors": [],
         "data": {}
     }
+    PHONE_NUMBER_REQUIRED = {
+        "code": "4014",
+        "message": "شماره تلفن همراه الزامی است.",
+        "status_code": status.HTTP_400_BAD_REQUEST,
+        "errors": ["phone_number field is required."],
+        "data": {}
+    }

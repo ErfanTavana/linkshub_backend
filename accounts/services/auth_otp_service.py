@@ -6,7 +6,11 @@ from django.utils import timezone
 from linkshub_backend.core.error_codes import ErrorCodes, SuccessCodes
 from accounts.constants import OTP_SMS_TEMPLATE, OTP_API_KEY
 import ghasedakpack
-
+from accounts.utils import format_phone_number
+from linkshub_backend.core.exceptions import CustomValidationError
+from accounts.repositories import get_or_create_user_by_phone,create_otp, get_latest_otp
+from linkshub_backend.core.error_codes import SuccessCodes
+from accounts.constants import OTP_VALIDITY_MINUTES, OTP_LENGTH
 
 def check_locked_verification(latest_otp):
     """
@@ -98,14 +102,48 @@ def send_otp_verification_sms(phone_number, verification_code):
             data={}
         )
     return response
-
-
-def send_otp(phone_number):
+def send_otp(phone_number: str, ip_address: str, code_type: str = "registration"):
     try:
+        # فرمت شماره
         phone_number = format_phone_number(phone_number)
-        user = get_or_create_user_by_phone(phone_number=phone_number)
+
+        # گرفتن یا ساخت کاربر
+        user, created = get_or_create_user_by_phone(phone_number=phone_number)
+
+        # بررسی محدودیت درخواست‌های قبلی
+        check_request_limit(user, code_type)
+
+        # گرفتن آخرین OTP کاربر
+        latest_otp = get_latest_otp(user, code_type)
+
+        # بررسی قفل بودن OTP
+        check_locked_verification(latest_otp)
+
+        # بررسی معتبر بودن OTP قبلی
+        check_active_otp(latest_otp)
+
+        # تولید OTP جدید
+        otp = create_otp(user=user, code_type=code_type, ip_address=ip_address)
+
+        # ارسال پیامک OTP
+        send_otp_verification_sms(phone_number, otp.random_code)
+
+        # پاسخ موفق
+        return {
+            "success": True,
+            "message": SuccessCodes.OTP_SENT_SUCCESSFULLY["message"],
+            "code": SuccessCodes.OTP_SENT_SUCCESSFULLY["code"],
+            "data": {
+                "expires_in_minutes": OTP_VALIDITY_MINUTES,  # مدت زمان انقضا
+                "otp_length": OTP_LENGTH,  # طول کد تایید
+                "phone_number": phone_number,  # شماره موبایل
+                "ip_address": ip_address,  # آی‌پی درخواست
+            }
+        }
+
 
     except CustomValidationError as e:
+        # مدیریت خطاهای سفارشی
         return {
             "success": e.success,
             "message": e.message,

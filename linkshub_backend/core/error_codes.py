@@ -7,6 +7,11 @@ class SuccessCodes:
         "message": "حساب کاربری قفل نمیباشد.",
         'data': {},
     }
+    OTP_SENT_SUCCESSFULLY = {
+        "code": "2002",
+        "message": "کد تایید با موفقیت ارسال شد.",
+        "data": {},
+    }
 
 
 class ErrorCodes:
